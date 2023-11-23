@@ -18,7 +18,7 @@ for m in mm_list:
         articles = link.find_all('li')
         for one in articles:
             mappings[one.text.strip('\n')] = str(one.find('a', href=True)).split('\"')[1]
-
+# Hindi News Titles are not scraped properly
 df = pd.DataFrame({'Title': list(mappings.keys())})
 df['URL'] = list(mappings.values())
 df.to_csv(f'raw_data/NDTV_{year}_data.csv')
