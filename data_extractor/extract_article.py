@@ -1,45 +1,30 @@
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
 import pandas as pd
+from tqdm import tqdm
+count = 0
 
-def fetch_article_content(url):
+
+def fetch_article_content(url, session):
+    global count
     try:
-        response = requests.get(url)
+        response = session.get(url)
         response.raise_for_status()
-
-        # Check for 404 error
-        if response.status_code == 404:
-            print(f"Page not found for {url}")
-            return None
-
         soup = BeautifulSoup(response.text, 'html.parser')
         article_content = soup.find('div', {'class': '_s30J clearfix'})  # Modify this based on the structure of the webpage
         return article_content.get_text() if article_content else None
     except Exception as e:
-        print(f"Error fetching article content for {url}: {e}")
+        print(f"Error fetching article content: {str(e)}")
+        count+=1
         return None
 
-csv_path = '../raw_data/TOI_2015_data.csv' 
-df = pd.read_csv(csv_path)
 
-df['article'] = df['URL'].apply(fetch_article_content)
-
-df.to_csv(csv_path, index=False)
-
-print("Data extraction and update completed.")
-
-# import requests
-# from bs4 import  BeautifulSoup
-
-# def fetch_article_content(url):
-#     try:
-#         response = requests.get(url)
-#         response.raise_for_status()
-#         soup = BeautifulSoup(response.text, 'html.parser')
-#         article_content = soup.find('div', {'class': '_s30J clearfix'})  # Modify this based on the structure of the webpage
-#         return article_content.get_text() if article_content else None
-#     except Exception as e:
-#         print(f"Error fetching article content: {e}")
-#         return None
-
-# print(fetch_article_content('http://timesofindia.indiatimes.com//city/jaipur/voluntary-load-disclosure-scheme-from-today-discom/articleshow/50402761.cms'))
+df = pd.read_csv('raw_data/NDTV_2015_data.csv')
+del df['Unnamed: 0']
+print(df['URL'].shape)
+content = []
+session = Session()
+pbar = tqdm(df['URL'].tolist(), desc="Processing URLs")
+for idx, link in enumerate(pbar):
+    content.append(fetch_article_content(url=link, session=session))
+    pbar.set_postfix({'Number of failed URLs': count})
