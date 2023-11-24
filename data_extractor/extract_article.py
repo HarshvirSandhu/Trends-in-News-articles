@@ -18,8 +18,8 @@ def fetch_article_content(url, session):
         count+=1
         return None
 
-
-df = pd.read_csv('raw_data/NDTV_2015_data.csv')
+path = '../raw_data/TOI_2015_data.csv'
+df = pd.read_csv(path)
 del df['Unnamed: 0']
 print(df['URL'].shape)
 content = []
@@ -28,3 +28,6 @@ pbar = tqdm(df['URL'].tolist(), desc="Processing URLs")
 for idx, link in enumerate(pbar):
     content.append(fetch_article_content(url=link, session=session))
     pbar.set_postfix({'Number of failed URLs': count})
+
+df['article'] = content
+df.to_csv(path)
