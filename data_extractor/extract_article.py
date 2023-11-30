@@ -11,16 +11,17 @@ def fetch_article_content(url, session):
         response = session.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
-        article_content = soup.find('div', {'class': '_s30J clearfix'})  # Modify this based on the structure of the webpage
+        article_content = soup.find('div', {'class': 'sp-cn ins_storybody'})  # Modify this based on the structure of the webpage
         return article_content.get_text() if article_content else None
     except Exception as e:
         print(f"Error fetching article content: {str(e)}")
         count+=1
         return None
+    
 
-path = '../raw_data/TOI_2015_data.csv'
+path = '../raw_data/test.csv'
 df = pd.read_csv(path)
-del df['Unnamed: 0']
+# del df['Unnamed: 0']
 print(df['URL'].shape)
 content = []
 session = Session()
